@@ -123,91 +123,91 @@ Public Sub ExportAllSource()
     VCS_Reference.ExportReferences source_path
 
 '-------------------------table export------------------------
-    obj_path = source_path & "tables\"
-    VCS_Dir.MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
-    VCS_Dir.ClearTextFilesFromDir obj_path, "txt"
+'     obj_path = source_path & "tables\"
+'     VCS_Dir.MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
+'     VCS_Dir.ClearTextFilesFromDir obj_path, "txt"
     
-    Dim td As DAO.TableDef
-    Dim tds As DAO.TableDefs
-    Set tds = Db.TableDefs
+'     Dim td As DAO.TableDef
+'     Dim tds As DAO.TableDefs
+'     Set tds = Db.TableDefs
 
-    obj_type_label = "tbldef"
-    obj_type_name = "Table_Def"
-    obj_type_num = acTable
-    obj_path = source_path & obj_type_label & "\"
-    obj_count = 0
-    obj_data_count = 0
-    VCS_Dir.MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
+'     obj_type_label = "tbldef"
+'     obj_type_name = "Table_Def"
+'     obj_type_num = acTable
+'     obj_path = source_path & obj_type_label & "\"
+'     obj_count = 0
+'     obj_data_count = 0
+'     VCS_Dir.MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
     
-    'move these into Table and DataMacro modules?
-    ' - We don't want to determin file extentions here - or obj_path either!
-    VCS_Dir.ClearTextFilesFromDir obj_path, "sql"
-    VCS_Dir.ClearTextFilesFromDir obj_path, "xml"
-    VCS_Dir.ClearTextFilesFromDir obj_path, "LNKD"
+'     'move these into Table and DataMacro modules?
+'     ' - We don't want to determin file extentions here - or obj_path either!
+'     VCS_Dir.ClearTextFilesFromDir obj_path, "sql"
+'     VCS_Dir.ClearTextFilesFromDir obj_path, "xml"
+'     VCS_Dir.ClearTextFilesFromDir obj_path, "LNKD"
     
-    Dim IncludeTablesCol As Collection
-    Set IncludeTablesCol = StrSetToCol(INCLUDE_TABLES, ",")
+'     Dim IncludeTablesCol As Collection
+'     Set IncludeTablesCol = StrSetToCol(INCLUDE_TABLES, ",")
     
-    Debug.Print VCS_String.PadRight("Exporting " & obj_type_label & "...", 24);
+'     Debug.Print VCS_String.PadRight("Exporting " & obj_type_label & "...", 24);
     
-    For Each td In tds
-        ' This is not a system table
-        ' this is not a temporary table
-        If Left$(td.name, 4) <> "MSys" And _
-        Left$(td.name, 1) <> "~" Then
-            If Len(td.connect) = 0 Then ' this is not an external table
-                VCS_Table.ExportTableDef Db, td, td.name, obj_path
-                If INCLUDE_TABLES = "*" Then
-                    DoEvents
-                    VCS_Table.ExportTableData CStr(td.name), source_path & "tables\"
-                    If Len(Dir$(source_path & "tables\" & td.name & ".txt")) > 0 Then
-                        obj_data_count = obj_data_count + 1
-                    End If
-                ElseIf (Len(Replace(INCLUDE_TABLES, " ", vbNullString)) > 0) And INCLUDE_TABLES <> "*" Then
-                    DoEvents
-                    On Error GoTo Err_TableNotFound
-                    If InCollection(IncludeTablesCol,td.name) Then
-                        VCS_Table.ExportTableData CStr(td.name), source_path & "tables\"
-                        obj_data_count = obj_data_count + 1
-                    End If
-Err_TableNotFound:
+'     For Each td In tds
+'         ' This is not a system table
+'         ' this is not a temporary table
+'         If Left$(td.name, 4) <> "MSys" And _
+'         Left$(td.name, 1) <> "~" Then
+'             If Len(td.connect) = 0 Then ' this is not an external table
+'                 VCS_Table.ExportTableDef Db, td, td.name, obj_path
+'                 If INCLUDE_TABLES = "*" Then
+'                     DoEvents
+'                     VCS_Table.ExportTableData CStr(td.name), source_path & "tables\"
+'                     If Len(Dir$(source_path & "tables\" & td.name & ".txt")) > 0 Then
+'                         obj_data_count = obj_data_count + 1
+'                     End If
+'                 ElseIf (Len(Replace(INCLUDE_TABLES, " ", vbNullString)) > 0) And INCLUDE_TABLES <> "*" Then
+'                     DoEvents
+'                     On Error GoTo Err_TableNotFound
+'                     If InCollection(IncludeTablesCol,td.name) Then
+'                         VCS_Table.ExportTableData CStr(td.name), source_path & "tables\"
+'                         obj_data_count = obj_data_count + 1
+'                     End If
+' Err_TableNotFound:
                     
-                'else don't export table data
-                End If
-            Else
-                VCS_Table.ExportLinkedTable td.name, obj_path
-            End If
+'                 'else don't export table data
+'                 End If
+'             Else
+'                 VCS_Table.ExportLinkedTable td.name, obj_path
+'             End If
             
-            obj_count = obj_count + 1
+'             obj_count = obj_count + 1
             
-        End If
-    Next
-    Debug.Print "[" & obj_count & "]"
-    If obj_data_count > 0 Then
-      Debug.Print VCS_String.PadRight("Exported data...", 24) & "[" & obj_data_count & "]"
-    End If
+'         End If
+'     Next
+'     Debug.Print "[" & obj_count & "]"
+'     If obj_data_count > 0 Then
+'       Debug.Print VCS_String.PadRight("Exported data...", 24) & "[" & obj_data_count & "]"
+'     End If
     
     
-    Debug.Print VCS_String.PadRight("Exporting Relations...", 24);
-    obj_count = 0
-    obj_path = source_path & "relations\"
-    VCS_Dir.MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
+'     Debug.Print VCS_String.PadRight("Exporting Relations...", 24);
+'     obj_count = 0
+'     obj_path = source_path & "relations\"
+'     VCS_Dir.MkDirIfNotExist Left$(obj_path, InStrRev(obj_path, "\"))
 
-    VCS_Dir.ClearTextFilesFromDir obj_path, "txt"
+'     VCS_Dir.ClearTextFilesFromDir obj_path, "txt"
 
-    Dim aRelation As DAO.Relation
+'     Dim aRelation As DAO.Relation
     
-    For Each aRelation In CurrentDb.Relations
-        ' Exclude relations from system tables and inherited (linked) relations
-        If Not (aRelation.name = "MSysNavPaneGroupsMSysNavPaneGroupToObjects" _
-                Or aRelation.name = "MSysNavPaneGroupCategoriesMSysNavPaneGroups" _
-                Or (aRelation.Attributes And DAO.RelationAttributeEnum.dbRelationInherited) = _
-                DAO.RelationAttributeEnum.dbRelationInherited) Then
-            VCS_Relation.ExportRelation aRelation, obj_path & aRelation.name & ".txt"
-            obj_count = obj_count + 1
-        End If
-    Next
-    Debug.Print "[" & obj_count & "]"
+'     For Each aRelation In CurrentDb.Relations
+'         ' Exclude relations from system tables and inherited (linked) relations
+'         If Not (aRelation.name = "MSysNavPaneGroupsMSysNavPaneGroupToObjects" _
+'                 Or aRelation.name = "MSysNavPaneGroupCategoriesMSysNavPaneGroups" _
+'                 Or (aRelation.Attributes And DAO.RelationAttributeEnum.dbRelationInherited) = _
+'                 DAO.RelationAttributeEnum.dbRelationInherited) Then
+'             VCS_Relation.ExportRelation aRelation, obj_path & aRelation.name & ".txt"
+'             obj_count = obj_count + 1
+'         End If
+'     Next
+'     Debug.Print "[" & obj_count & "]"
     
     Debug.Print "Done."
 End Sub
